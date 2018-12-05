@@ -36,6 +36,7 @@ spec:
         command:
           - bitcoind
         args:
+          - -conf=/etc/bitcoin/bitcoin.conf
           - -datadir=/btcdata
         env:
         - name: BITCOIN_RPC_USER
@@ -51,6 +52,8 @@ spec:
         volumeMounts:
           - mountPath: /btcdata
             name: bitcoin-data
+          - mountPath: /etc/bitcoin
+            name: bitcoin-config
         resources:
           requests:
             memory: "2Gi"
@@ -63,3 +66,6 @@ spec:
           persistentVolumeClaim:
             claimName: bitcoin-pvc
             #fsType: ext4
+        - name: bitcoin-config
+          configMap:
+            name: bitcoin-config
