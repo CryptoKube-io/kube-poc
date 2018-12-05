@@ -1,3 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitcoin
+  namespace: default
+spec:
+  ports:
+    - port: 8333
+      targetPort: 8333
+  selector:
+    service: bitcoin
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+
+---
+
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -47,3 +63,15 @@ spec:
           persistentVolumeClaim:
             claimName: bitcoin-pvc
             #fsType: ext4
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bitcoin
+type: Opaque
+data:
+  rpcuser: REPLACE_ME
+  rpcpass: REPLACE_ME
+
