@@ -1,5 +1,21 @@
 # CryptoKube Proof-of-concept
 
+## Prerequisites
+- DigitalOcean account w/Kubernetes service
+- Kuberenetes cluster created, env var KUBECONFIG=<path/to/kubeconfig.yaml>
+- kubectl installed on management host (laptop or otherwise)
+
+## Setup
+```bash
+./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
+source env.sh
+kubectl cluster-info
+kubectl create -f bitcoin-secrets.yaml
+kubectl create configmap bitcoin-config --from-file=bitcoin.conf
+kubectl create -f bitcoin-deploy.yaml
+kubectl logs deploy/bitcoin --tail=5 -f
+```
+
 ## External resources
 ### Bitcoin
 - https://bitcoin.org/en/download
