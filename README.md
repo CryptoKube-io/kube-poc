@@ -6,6 +6,7 @@
 - kubectl installed on management host (laptop or otherwise)
 
 ## Setup
+### Bitcoin
 ```bash
 ./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
 source env.sh
@@ -14,6 +15,13 @@ kubectl create -f bitcoin-secrets.yaml
 kubectl create configmap bitcoin-config --from-file=bitcoin.conf
 kubectl create -f bitcoin-deploy.yaml
 kubectl logs deploy/bitcoin --tail=5 -f
+```
+### Ethereum
+```bash
+kubectl create -f parity-pvc.yaml
+kubectl create configmap parity-config --from-file=config.toml
+kubectl create -f parity-statefulset.yaml
+kubectl logs statefulset/parity --tail=5 -f
 ```
 
 ## External resources
