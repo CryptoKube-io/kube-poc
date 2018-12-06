@@ -41,3 +41,5 @@ kubectl logs deploy/bitcoin --tail=5 -f
 - https://github.com/carlolm/kube-parity
 - https://github.com/jpoon/kubernetes-ethereum-chart
 - https://github.com/helm/charts/tree/master/stable/ethereum
+- https://github.com/ethersphere/swarm-kubernetes
+- https://github.com/ethersphere/helm-charts
