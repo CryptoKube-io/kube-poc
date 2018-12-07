@@ -8,6 +8,10 @@
 ## Setup
 ### Cluster-wide
 ```bash
+./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
+source env.sh
+
+kubectl cluster-info
 kubectl create -f namespaces.yaml
 
 git clone https://github.com/coreos/prometheus-operator.git
@@ -20,13 +24,12 @@ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; 
 
 ### Bitcoin
 ```bash
-./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
-source env.sh
-kubectl cluster-info
-kubectl create -f bitcoin-secrets.yaml
-kubectl create configmap bitcoin-config --from-file=bitcoin.conf
-kubectl create -f bitcoin-deploy.yaml
-kubectl logs deploy/bitcoin --tail=5 -f
+kubectl create -f bitcoin/bitcoin-secrets.yaml
+kubectl create configmap bitcoin-config -n bitcoin-testnet --from-file=bitcoin.conf=bitcoin/bitcoin.conf_testnet
+kubectl create configmap bitcoin-config -n bitcoin-mainnet --from-file=bitcoin.conf=bitcoin/bitcoin.conf_mainnet
+kubectl create -f bitcoin/bitcoin-statefulset.yaml -n bitcoin-testnet
+kubectl create -f bitcoin/bitcoin-statefulset.yaml -n bitcoin-mainnet
+kubectl -n bitcoin-testnet logs statefulset/bitcoin --tail=5 -f
 ```
 ### Ethereum
 ```bash
