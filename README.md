@@ -18,9 +18,15 @@ kubectl logs deploy/bitcoin --tail=5 -f
 ```
 ### Ethereum
 ```bash
-kubectl create -f parity-pvc.yaml
-kubectl create configmap parity-config --from-file=config.toml
-kubectl create -f parity-statefulset.yaml
+#kubectl create -f parity-pvc.yaml
+#kubectl create configmap parity-config --from-file=config.toml
+kubectl create -f namespaces.yaml
+kubectl create configmap -n ethereum-kovan parity-config --from-file=config.toml=parity/config.toml_kovan
+kubectl create configmap -n ethereum-ropsten parity-config --from-file=config.toml=parity/config.toml_ropsten
+kubectl create configmap -n ethereum-mainnet parity-config --from-file=config.toml=parity/config.toml_mainnet 
+kubectl create -f parity/parity-statefulset.yaml -n ethereum-kovan
+kubectl create -f parity/parity-statefulset.yaml -n ethereum-ropsten
+kubectl create -f parity/parity-statefulset.yaml -n ethereum-mainnet
 kubectl logs statefulset/parity --tail=5 -f
 ```
 
@@ -54,3 +60,4 @@ For monitoring, alerting, and visualization I have been using [kube-prometheus](
 - https://github.com/helm/charts/tree/master/stable/ethereum
 - https://github.com/ethersphere/swarm-kubernetes
 - https://github.com/ethersphere/helm-charts
+ 
