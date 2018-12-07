@@ -24,24 +24,30 @@ until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; 
 
 ### Bitcoin
 ```bash
-kubectl create -f bitcoin/bitcoin-secrets.yaml
-kubectl create configmap bitcoin-config -n bitcoin-testnet --from-file=bitcoin.conf=bitcoin/bitcoin.conf_testnet
-kubectl create configmap bitcoin-config -n bitcoin-mainnet --from-file=bitcoin.conf=bitcoin/bitcoin.conf_mainnet
-kubectl create -f bitcoin/bitcoin-statefulset.yaml -n bitcoin-testnet
-kubectl create -f bitcoin/bitcoin-statefulset.yaml -n bitcoin-mainnet
+kubectl -n bitcoin-testnet create -f bitcoin/testnet/secrets.yaml
+kubectl -n bitcoin-testnet create configmap bitcoin-config --from-file=bitcoin.conf=bitcoin/testnet/bitcoin.conf
+kubectl -n bitcoin-testnet create -f bitcoin/bitcoin-statefulset.yaml
 kubectl -n bitcoin-testnet logs statefulset/bitcoin --tail=5 -f
+
+kubectl -n bitcoin-mainnet create -f bitcoin/mainnet/secrets.yaml
+kubectl -n bitcoin-mainnet create configmap bitcoin-config --from-file=bitcoin.conf=bitcoin/mainnet/bitcoin.conf
+kubectl -n bitcoin-mainnet create -f bitcoin/bitcoin-statefulset.yaml
+kubectl -n bitcoin-mainnet logs statefulset/bitcoin --tail=5 -f
 ```
 ### Ethereum
 ```bash
-#kubectl create -f parity-pvc.yaml
-#kubectl create configmap parity-config --from-file=config.toml
-kubectl create configmap -n ethereum-kovan parity-config --from-file=config.toml=parity/config.toml_kovan
-kubectl create configmap -n ethereum-ropsten parity-config --from-file=config.toml=parity/config.toml_ropsten
-kubectl create configmap -n ethereum-mainnet parity-config --from-file=config.toml=parity/config.toml_mainnet 
-kubectl create -f parity/parity-statefulset.yaml -n ethereum-kovan
-kubectl create -f parity/parity-statefulset.yaml -n ethereum-ropsten
-kubectl create -f parity/parity-statefulset.yaml -n ethereum-mainnet
-kubectl logs statefulset/parity --tail=5 -f
+kubectl -n ethereum-kovan create configmap parity-config --from-file=config.toml=parity/kovan/config.toml
+kubectl -n ethereum-kovan create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-kovan logs statefulset/parity --tail=5 -f
+
+kubectl -n ethereum-ropsten create configmap parity-config --from-file=config.toml=parity/ropsten/config.toml
+kubectl -n ethereum-ropsten create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-ropsten logs statefulset/parity --tail=5 -f
+
+kubectl -n ethereum-mainnet create configmap parity-config --from-file=config.toml=parity/mainnet/config.toml
+kubectl -n ethereum-mainnet create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-mainnet logs statefulset/parity --tail=5 -f
+
 ```
 
 ## Monitoring
