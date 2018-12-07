@@ -24,6 +24,9 @@ kubectl create -f parity-statefulset.yaml
 kubectl logs statefulset/parity --tail=5 -f
 ```
 
+## Monitoring
+For monitoring, alerting, and visualization I have been using [kube-prometheus](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus). It seems to cause issues with namespaces (preventing termination at least). As a workaround, I delete kube-prometheus, modify namespaces, and re-create it.
+
 ## External resources
 ### Bitcoin
 - https://bitcoin.org/en/download
