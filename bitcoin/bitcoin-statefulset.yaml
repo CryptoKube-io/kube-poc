@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Service
 metadata:
   name: bitcoin
@@ -13,21 +13,25 @@ spec:
 
 ---
 
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1beta1
+kind: StatefulSet
 metadata:
-  namespace: default
   labels:
     service: bitcoin
+    app: bitcoin
   name: bitcoin
 spec:
-  strategy:
-    type: Recreate
   replicas: 1
+  selector:
+    matchLabels:
+      app: bitcoin
+  serviceName: bitcoin
   template:
     metadata:
+      name: bitcoin
       labels:
         service: bitcoin
+        app: bitcoin
     spec:
       containers:
       - image: thinkmassive/bitcoin
@@ -48,6 +52,13 @@ spec:
             secretKeyRef:
               name: bitcoin
               key: rpcpass
+        ports:
+          - containerPort: 8332
+            protocol: TCP
+            name: rpc-port
+          - containerPort: 8333
+            protocol: TCP
+            name: p2p-port
         volumeMounts:
           - mountPath: /btcdata
             name: bitcoin-data
@@ -68,3 +79,12 @@ spec:
         - name: bitcoin-config
           configMap:
             name: bitcoin-config
+  volumeClaimTemplates:
+    - metadata:
+        name: bitcoin-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "do-block-storage"
+        resources:
+          requests:
+            storage: 300Gi
