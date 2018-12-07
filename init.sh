@@ -1,7 +1,7 @@
 #\!/bin/sh
 
 function help {
-  echo "Usage: $0 -c <kubeconfig.yaml> -u <rpcuser> -p <rpcpass>"
+  echo "Usage: $0 -b [bitcoin|ethereum] -n <network> -u <rpcuser> -p <rpcpass>"
   echo ''
 }
 
@@ -10,9 +10,6 @@ function help {
 while [[ $# -gt 0 ]]; do
   arg="$1"
   case $arg in
-    -c|--config)
-      input_config="$2"
-      shift; shift ;;
     -u|--rpcuser)
       input_rpcuser="$2"
       shift; shift ;;
