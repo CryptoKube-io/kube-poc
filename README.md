@@ -6,23 +6,63 @@
 - kubectl installed on management host (laptop or otherwise)
 
 ## Setup
-### Bitcoin
+### Cluster-wide
 ```bash
 ./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
 source env.sh
+
 kubectl cluster-info
-kubectl create -f bitcoin-secrets.yaml
-kubectl create configmap bitcoin-config --from-file=bitcoin.conf
-kubectl create -f bitcoin-deploy.yaml
-kubectl logs deploy/bitcoin --tail=5 -f
+kubectl create -f namespaces.yaml
+
+git clone https://github.com/coreos/prometheus-operator.git
+
+kubectl create -f prometheus-operator/contrib/kube-prometheus/manifests/ || true
+until kubectl get crd servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+# repeate last "kubectl create" command if some resources fail to create (due to a race condition)
+```
+
+### Bitcoin
+```bash
+kubectl -n bitcoin-testnet create -f bitcoin/testnet/secrets.yaml
+kubectl -n bitcoin-testnet create configmap bitcoin-config --from-file=bitcoin.conf=bitcoin/testnet/bitcoin.conf
+kubectl -n bitcoin-testnet create -f bitcoin/bitcoin-statefulset.yaml
+kubectl -n bitcoin-testnet logs statefulset/bitcoin --tail=5 -f
+
+kubectl -n bitcoin-mainnet create -f bitcoin/mainnet/secrets.yaml
+kubectl -n bitcoin-mainnet create configmap bitcoin-config --from-file=bitcoin.conf=bitcoin/mainnet/bitcoin.conf
+kubectl -n bitcoin-mainnet create -f bitcoin/bitcoin-statefulset.yaml
+kubectl -n bitcoin-mainnet logs statefulset/bitcoin --tail=5 -f
 ```
 ### Ethereum
 ```bash
-kubectl create -f parity-pvc.yaml
-kubectl create configmap parity-config --from-file=config.toml
-kubectl create -f parity-statefulset.yaml
-kubectl logs statefulset/parity --tail=5 -f
+kubectl -n ethereum-kovan create configmap parity-config --from-file=config.toml=parity/kovan/config.toml
+kubectl -n ethereum-kovan create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-kovan logs statefulset/parity --tail=5 -f
+
+kubectl -n ethereum-ropsten create configmap parity-config --from-file=config.toml=parity/ropsten/config.toml
+kubectl -n ethereum-ropsten create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-ropsten logs statefulset/parity --tail=5 -f
+
+kubectl -n ethereum-mainnet create configmap parity-config --from-file=config.toml=parity/mainnet/config.toml
+kubectl -n ethereum-mainnet create -f parity/parity-statefulset.yaml
+kubectl -n ethereum-mainnet logs statefulset/parity --tail=5 -f
+
 ```
+
+## Monitoring
+For monitoring, alerting, and visualization I have been using [kube-prometheus](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus). It seems to cause issues with namespaces (preventing termination at least). As a workaround, I delete kube-prometheus, modify namespaces, and re-create it.
+### Grafana
+```bash
+kubectl --namespace monitoring port-forward svc/grafana 3000
+```
+Then visit http://localhost:3000 (initial login is `admin:admin`)
+### Prometheus
+```bash
+kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090     # Prometheus
+kubectl --namespace monitoring port-forward svc/alertmanager-main 9093  # Alert Manager
+```
+Then visit http://locahost:9090 or http://localhost:9093
 
 ## External resources
 ### Bitcoin
@@ -51,3 +91,4 @@ kubectl logs statefulset/parity --tail=5 -f
 - https://github.com/helm/charts/tree/master/stable/ethereum
 - https://github.com/ethersphere/swarm-kubernetes
 - https://github.com/ethersphere/helm-charts
+ 
