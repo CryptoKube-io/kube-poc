@@ -52,6 +52,17 @@ kubectl -n ethereum-mainnet logs statefulset/parity --tail=5 -f
 
 ## Monitoring
 For monitoring, alerting, and visualization I have been using [kube-prometheus](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus). It seems to cause issues with namespaces (preventing termination at least). As a workaround, I delete kube-prometheus, modify namespaces, and re-create it.
+### Grafana
+```bash
+kubectl --namespace monitoring port-forward svc/grafana 3000
+```
+Then visit http://localhost:3000 (initial login is `admin:admin`)
+### Prometheus
+```bash
+kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090     # Prometheus
+kubectl --namespace monitoring port-forward svc/alertmanager-main 9093  # Alert Manager
+```
+Then visit http://locahost:9090 or http://localhost:9093
 
 ## External resources
 ### Bitcoin
