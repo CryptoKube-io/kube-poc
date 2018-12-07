@@ -1,7 +1,6 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  namespace: default
   labels:
     service: parity
     app: parity
