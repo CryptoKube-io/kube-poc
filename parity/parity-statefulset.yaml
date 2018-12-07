@@ -1,0 +1,64 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  namespace: default
+  labels:
+    service: parity
+    app: parity
+  name: parity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parity
+  serviceName: parity
+  template:
+    metadata:
+      name: parity
+      labels:
+        service: parity
+        app: parity
+    spec:
+      containers:
+      - name: parity
+        image: parity/parity:stable
+        imagePullPolicy: IfNotPresent
+        args:
+          - --config
+          - /etc/parity/config.toml
+        ports:
+          - containerPort: 8545
+            protocol: TCP
+            name: rpc-port
+        livenessProbe:
+          tcpSocket:
+            port: 8545
+          initialDelaySeconds: 60
+        volumeMounts:
+          - mountPath: /parity-data
+            name: parity-data
+          - mountPath: /etc/parity
+            name: parity-config
+        resources:
+          requests:
+            memory: "2Gi"
+      - name: event-watcher
+        image: "yzhang1994/eth-node-checker"
+        imagePullPolicy: IfNotPresent
+        command: ["npm"]
+        args: ["start"]
+        env:
+          - name: "WEB3_URL"
+            value: "http://localhost:8545"
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 2000
+      volumes:
+        - name: parity-data
+          persistentVolumeClaim:
+            claimName: parity-pvc
+            #fsType: ext4
+        - name: parity-config
+          configMap:
+            name: parity-config
