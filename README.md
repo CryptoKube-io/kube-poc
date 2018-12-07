@@ -6,6 +6,18 @@
 - kubectl installed on management host (laptop or otherwise)
 
 ## Setup
+### Cluster-wide
+```bash
+kubectl create -f namespaces.yaml
+
+git clone https://github.com/coreos/prometheus-operator.git
+
+kubectl create -f prometheus-operator/contrib/kube-prometheus/manifests/ || true
+until kubectl get crd servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+# repeate last "kubectl create" command if some resources fail to create (due to a race condition)
+```
+
 ### Bitcoin
 ```bash
 ./init.sh -c mycluster-kubeconfig.yaml -u myrpcuser -p myrpcpass # set KUBECONFIG, rpcuser+rpcpass secrets
@@ -20,7 +32,6 @@ kubectl logs deploy/bitcoin --tail=5 -f
 ```bash
 #kubectl create -f parity-pvc.yaml
 #kubectl create configmap parity-config --from-file=config.toml
-kubectl create -f namespaces.yaml
 kubectl create configmap -n ethereum-kovan parity-config --from-file=config.toml=parity/config.toml_kovan
 kubectl create configmap -n ethereum-ropsten parity-config --from-file=config.toml=parity/config.toml_ropsten
 kubectl create configmap -n ethereum-mainnet parity-config --from-file=config.toml=parity/config.toml_mainnet 
