@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bitcoin-mainnet
+  labels:
+    name: bitcoin-mainnet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bitcoin-testnet
+  labels:
+    name: bitcoin-testnet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ethereum-mainnet
+  labels:
+    name: ethereum-mainnet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ethereum-ropsten
+  labels:
+    name: ethereum-ropsten
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ethereum-kovan
+  labels:
+    name: ethereum-kovan
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ethereum-rinkeby
+  labels:
+    name: ethereum-rinkeby
