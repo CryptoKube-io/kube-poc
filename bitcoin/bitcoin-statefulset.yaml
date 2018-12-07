@@ -1,18 +1,3 @@
-apiVersion: apps/v1
-kind: Service
-metadata:
-  name: bitcoin
-spec:
-  ports:
-    - port: 8333
-      targetPort: 8333
-  selector:
-    service: bitcoin
-  type: LoadBalancer
-  externalTrafficPolicy: Local
-
----
-
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:

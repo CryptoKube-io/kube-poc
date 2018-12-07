@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: bitcoin
+spec:
+  ports:
+    - port: 18333
+      targetPort: 18333
+  selector:
+    service: bitcoin
+  type: LoadBalancer
+  externalTrafficPolicy: Local
