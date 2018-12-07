@@ -61,3 +61,12 @@ spec:
         - name: parity-config
           configMap:
             name: parity-config
+  volumeClaimTemplates:
+    - metadata:
+        name: parity-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "do-block-storage"
+        resources:
+          requests:
+            storage: 200Gi
