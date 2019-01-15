@@ -1,0 +1,37 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    service: lnd
+    app: lnd
+  name: lnd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lnd
+  serviceName: lnd
+  template:
+    metadata:
+      name: lnd
+      labels:
+        service: lnd
+        app: lnd
+    spec:
+      containers:
+      - image: lightninglabs/lnd
+        name: lnd
+        args:
+          - --bitcoin.active
+          - --bitcoin.mainnet
+        ports:
+          - containerPort: 9735
+            protocol: TCP
+            name: p2p-port
+        resources:
+          requests:
+            memory: "2Gi"
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 2000
